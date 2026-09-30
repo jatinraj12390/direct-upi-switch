@@ -51,6 +51,20 @@ flowchart TD
 
 ---
 
+## Demo & Console Screenshots
+
+### Developer Console & Dynamic QR Checkout
+The developer console generates the standard NPCI intent URI (`upi://pay`), renders a real-time scannable QR code, and provides 1-tap mobile deep linking:
+
+![DirectUPI Console & Dynamic QR Checkout](docs/images/checkout-and-qr.png)
+
+### Live Concurrency & Double-Spend Defense
+Demonstrating real-time race condition prevention in the browser: 5 parallel requests attempt to claim the identical UTR across 5 separate orders simultaneously. Exactly 1 thread commits (`200 OK`), while 4 are intercepted and rejected (`409 Conflict`):
+
+![Live Multi-Threaded Concurrency Test](docs/images/concurrency-race-test.png)
+
+---
+
 ## The Concurrency Challenge: Double-Spending
 
 When a customer pays via UPI, their bank issues a unique 12-digit UTR (Unique Transaction Reference). To claim an order, the customer submits this UTR.
