@@ -29,23 +29,23 @@ I built this project to explore how a direct UPI switch works without middleman 
 
 ```mermaid
 flowchart TD
-    Client([Customer / Mobile App]) -->|1. POST /api/payments/create| Controller[PaymentController]
-    Controller -->|2. Delegate| Service[PaymentService]
-    Service -->|3. Construct upi://pay URI| DB[(H2 Database / JPA)]
-    Service -->|4. Return Order + QR Code| Client
+    Client(["Customer / Mobile App"]) -->|"1. POST /api/payments/create"| Controller["PaymentController"]
+    Controller -->|"2. Delegate"| Service["PaymentService"]
+    Service -->|"3. Construct upi://pay URI"| DB[("H2 Database / JPA")]
+    Service -->|"4. Return Order + QR Code"| Client
     
-    Client -->|5. Complete payment in UPI app| Client
-    Client -->|6. POST /api/payments/{id}/verify with UTR| Controller
+    Client -->|"5. Complete payment in UPI app"| Client
+    Client -->|"6. POST /api/payments/:id/verify with UTR"| Controller
     
-    subgraph Guard [Anti-Double-Spend Defense]
-        Controller -->|Verify UTR| Service
-        Service -->|Tier 1: Check findByUtr| InAppCheck{Already Claimed?}
-        InAppCheck -->|Yes| Err1[HTTP 409 Conflict]
-        InAppCheck -->|No| Flush[saveAndFlush with Unique UTR Index]
-        Flush -->|Tier 2: Concurrent Collision| DBIndex{Database Unique Index}
-        DBIndex -->|Constraint Violation| Catch[Catch DataIntegrityViolationException]
-        Catch --> Err2[HTTP 409 Conflict]
-        DBIndex -->|Commit Successful| OK[HTTP 200 OK - Order PAID]
+    subgraph Guard ["Anti-Double-Spend Defense"]
+        Controller -->|"Verify UTR"| Service
+        Service -->|"Tier 1: Check findByUtr"| InAppCheck{"Already Claimed?"}
+        InAppCheck -->|"Yes"| Err1["HTTP 409 Conflict"]
+        InAppCheck -->|"No"| Flush["saveAndFlush with Unique UTR Index"]
+        Flush -->|"Tier 2: Concurrent Collision"| DBIndex{"Database Unique Index"}
+        DBIndex -->|"Constraint Violation"| Catch["Catch DataIntegrityViolationException"]
+        Catch --> Err2["HTTP 409 Conflict"]
+        DBIndex -->|"Commit Successful"| OK["HTTP 200 OK - Order PAID"]
     end
 ```
 
